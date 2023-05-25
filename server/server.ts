@@ -17,6 +17,8 @@ const appRouter = router({
   }),
 });
 
+export type AppRouter = typeof appRouter; // for client
+
 const createHTTPServer = ({ router }: { router: { [key: string]: any } }) => {
   const app = express();
 
