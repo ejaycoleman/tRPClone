@@ -1,19 +1,4 @@
-// import { stripVTControlCharacters } from "util";
-// import type { AppRouter } from "../server/server";
-
-// const handler = {
-//   get() {
-//     return "world";
-//   },
-// };
-
-// const proxy2 = new Proxy(() => {}, handler);
-
-// const wrapFunctions = <T>() => proxy2;
-
-// const t = wrapFunctions<AppRouter>;
-
-// const main = () => {};
+import type { AppRouter } from "../server/server";
 
 const createInnerProxy = (callback: any, path: any[]) => {
   const proxy: unknown = new Proxy(() => {}, {
@@ -41,7 +26,15 @@ const createFlatProxy = (callback: any) => {
   });
 };
 
-const createTRPCProxy = () => {
+type Query = {
+  query: (param: number) => number;
+};
+
+type OverwriteChildren<T> = {
+  [PropertyKey in keyof T]: Query;
+};
+
+const createTRPCProxy = <T>() => {
   return createFlatProxy((key: any) => {
     console.log(key); // the name of the route!
 
@@ -51,17 +44,13 @@ const createTRPCProxy = () => {
       const procedureType = pathCopy.pop();
 
       console.log(procedureType);
-
-      // const fullPath = pathCopy.join(".");
-
-      // return procedureType(fullPath, ...args);
       return console.log(args);
     });
-  });
+  }) as unknown as OverwriteChildren<T>;
 };
 
-const createTRPCProxyClient = () => createTRPCProxy();
+const createTRPCProxyClient = () => createTRPCProxy<AppRouter>();
 
-const t = createTRPCProxyClient() as any;
+const t = createTRPCProxyClient();
 
-t.idk.letgo("asd");
+t.getValues.query(1);
