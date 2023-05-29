@@ -1,4 +1,4 @@
-import type { AppRouter } from "../server/server";
+import type { AppRouter, Get, Post } from "../server/server";
 
 const createInnerProxy = (callback: any, path: any[]) => {
   const proxy: unknown = new Proxy(() => {}, {
@@ -30,11 +30,23 @@ type Query = {
   query: (param: number) => number;
 };
 
-type OverwriteChildren<T> = {
-  [PropertyKey in keyof T]: Query;
+type Mutate = {
+  mutate: (param: number) => number;
 };
 
-const createTRPCProxy = <T>() => {
+// type Idk = <T>{[PropertyKey in keyof T]: Get | Post}
+
+type OverwriteChildren<T extends AppRouter> = {
+  [PropertyKey in keyof T]: T[PropertyKey] extends Post
+    ? Query
+    : T[PropertyKey] extends Get
+    ? Mutate
+    : unknown;
+};
+
+// type Idk = [PropertyKey in keyof T]: Get
+
+const createTRPCProxy = <T extends AppRouter>() => {
   return createFlatProxy((key: any) => {
     console.log(key); // the name of the route!
 
@@ -53,4 +65,48 @@ const createTRPCProxyClient = () => createTRPCProxy<AppRouter>();
 
 const t = createTRPCProxyClient();
 
-t.getValues.query(1);
+// const a: AppRouter
+// t.
+// a.
+
+// t.
+
+// t.
+// t.
+
+// t.
+// t.getValues.
+// t.
+// t.
+
+// t.getValues
+
+// const a: OverwriteChildren<AppRouter> = {} as any;
+// a.
+
+// t.getValues.query(1);
+
+// type One = () => void;
+// type Two = () => void;
+
+// type Infer<T> = T extends One ? string : T extends Two ? number : unknown;
+
+// const a: Infer<
+// t.
+// t.postValues
+// t.getValues.query();
+// t.postValues.mu
+// t.
+// t.
+// t.
+// t.getValues.mutate
+// t.
+
+// t.
+// t.getValues.query();
+
+// t.postValues.
+// t.getValues.mutate
+// t.
+// t.postValues.
+// t.
