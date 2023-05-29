@@ -1,23 +1,18 @@
 import express from "express";
 
-// type RouteType = () => string | string[]; // any valid route response
-
 const router = <T>(routes: { [K in keyof T]: T[K] }) => {
   return routes;
 };
 
-// export type Get = <T>(V: T) => T;
-export type Get = () => string | string[]; // any valid route response
-export type Post = () => string | string[]; // any valid route response
+export type Get = { callback: () => string | string[]; type: "get" }; // any valid route response
+export type Post = { callback: () => string | string[]; type: "post" }; // any valid route response
 
-const get = (getCallback: Get) => {
-  return getCallback;
+const get = (getCallback: () => string | string[]): Get => {
+  return { callback: getCallback, type: "get" };
 };
 
-// export type Post = <T>(V: T) => T;
-
-const post = (getCallback: Post) => {
-  return getCallback;
+const post = (getCallback: () => string | string[]): Post => {
+  return { callback: getCallback, type: "post" };
 };
 
 const appRouter = router({
@@ -30,8 +25,6 @@ const appRouter = router({
     return ["post res"];
   }),
 });
-
-// appRouter.
 
 export type AppRouter = typeof appRouter; // for client
 
