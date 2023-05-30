@@ -1,4 +1,5 @@
 import { Get, Post } from "../server/library";
+import axios, { AxiosResponse } from "axios";
 
 const createInnerProxy = (callback: any, path: any[]) => {
   const proxy: unknown = new Proxy(() => {}, {
@@ -27,11 +28,11 @@ const createFlatProxy = (callback: any) => {
 };
 
 type Query = {
-  query: (param: string) => void;
+  query: (param: string) => AxiosResponse;
 };
 
 type Mutate = {
-  mutate: (param: string) => string;
+  mutate: (param: string) => AxiosResponse;
 };
 
 type OverwriteChildren<T> = {
@@ -49,16 +50,12 @@ export const createTRPCProxy = <T>() => {
       const procedureType = pathCopy.pop();
 
       if (procedureType === "query") {
-        return console.log(
-          "GET ",
-          `localhost:3000/${routeName}?args=${args[0]}`
-        );
+        return axios.get(`http://localhost:3000/${routeName}?args=${args[0]}`);
       }
 
-      return console.log(
-        "POST ",
-        `localhost:3000/${routeName} with {args: ${args[0]}}`
-      );
+      return axios.post(`http://localhost:3000/${routeName}`, {
+        args: args[0],
+      });
     });
   }) as unknown as OverwriteChildren<T>;
 };

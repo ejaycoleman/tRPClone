@@ -1,12 +1,20 @@
 import { createHTTPServer, get, post, router } from "./library";
 
 const appRouter = router({
-  getValues: get(() => {
+  getValues: get((req) => {
     console.log("get endpoint hit!");
-    return ["get res"];
+
+    const arg = req?.query.args;
+
+    return `GET called with the args: ${arg}`;
   }),
-  postValues: post(() => {
+  postValues: post((req) => {
     console.log("post endpoint hit!");
+
+    console.log(req?.body);
+
+    const arg = req?.query.args;
+
     return ["post res"];
   }),
 });
