@@ -5,5 +5,16 @@ const createTRPCProxyClient = () => createTRPCProxy<AppRouter>();
 
 const t = createTRPCProxyClient();
 
-t.getValues.query("test");
-t.postValues.mutate("Two");
+const query = async () => {
+  const query = await t.getValues.query({ get: "value" });
+  console.log(query.data);
+};
+
+query();
+
+const mutate = async () => {
+  const query = await t.postValues.mutate({ post: "value" });
+  console.log(query.data);
+};
+
+mutate();

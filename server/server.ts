@@ -1,13 +1,15 @@
 import { createHTTPServer, get, post, router } from "./library";
 
 const appRouter = router({
-  getValues: get(() => {
+  getValues: get((input) => {
     console.log("get endpoint hit!");
-    return ["get res"];
+
+    return `GET called with the args: ${JSON.stringify(input)}`;
   }),
-  postValues: post(() => {
+  postValues: post((input) => {
     console.log("post endpoint hit!");
-    return ["post res"];
+
+    return `POST request with body: ${JSON.stringify(input)}`;
   }),
 });
 
