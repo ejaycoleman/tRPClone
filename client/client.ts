@@ -10,8 +10,7 @@ const query = async () => {
   console.log(query.data);
 };
 
-// query();
-// t.postValues.mutate("Two");
+query();
 
 const mutate = async () => {
   const query = await t.postValues.mutate("test");

@@ -11,11 +11,9 @@ const appRouter = router({
   postValues: post((req) => {
     console.log("post endpoint hit!");
 
-    console.log(req?.body);
+    const obj = JSON.stringify(req?.body);
 
-    const arg = req?.query.args;
-
-    return ["post res"];
+    return `POST request with body: ${obj}`;
   }),
 });
 

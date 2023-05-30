@@ -1,4 +1,5 @@
 import express, { Request } from "express";
+import bodyParser from "body-parser";
 
 export const router = <T>(routes: { [K in keyof T]: T[K] }) => {
   return routes;
@@ -30,6 +31,9 @@ export const createHTTPServer = ({
 }) => {
   const app = express();
 
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+
   Object.entries(router).map(([routeName, routeFunction]) => {
     if (routeFunction.type == "get") {
       app.get("/" + routeName, (req, res) => {
@@ -40,7 +44,6 @@ export const createHTTPServer = ({
 
     if (routeFunction.type == "post") {
       app.post("/" + routeName, (req, res) => {
-        console.log(req);
         res.send(routeFunction.callback(req));
       });
       return;
