@@ -5,21 +5,31 @@ export const router = <T>(routes: { [K in keyof T]: T[K] }) => {
   return routes;
 };
 
+type JSONValue = string | number | boolean | JSONObject | JSONArray;
+
+interface JSONObject {
+  [x: string]: JSONValue;
+}
+
+interface JSONArray extends Array<JSONValue> {}
+
 export type Get = {
-  callback: (req?: Request) => string | string[];
+  callback: (req?: JSONValue) => string | string[];
   type: "get";
 };
 export type Post = {
-  callback: (req?: Request) => string | string[];
+  callback: (req?: JSONValue) => string | string[];
   type: "post";
 };
 
-export const get = (getCallback: (req?: Request) => string | string[]): Get => {
+export const get = (
+  getCallback: (req?: JSONValue) => string | string[]
+): Get => {
   return { callback: getCallback, type: "get" };
 };
 
 export const post = (
-  getCallback: (req?: Request) => string | string[]
+  getCallback: (req?: JSONValue) => string | string[]
 ): Post => {
   return { callback: getCallback, type: "post" };
 };
@@ -37,14 +47,15 @@ export const createHTTPServer = ({
   Object.entries(router).map(([routeName, routeFunction]) => {
     if (routeFunction.type == "get") {
       app.get("/" + routeName, (req, res) => {
-        res.send(routeFunction.callback(req));
+        const input = decodeURIComponent(req?.query.input as string);
+        res.send(routeFunction.callback(JSON.parse(input)));
       });
       return;
     }
 
     if (routeFunction.type == "post") {
       app.post("/" + routeName, (req, res) => {
-        res.send(routeFunction.callback(req));
+        res.send(routeFunction.callback(req.body));
       });
       return;
     }

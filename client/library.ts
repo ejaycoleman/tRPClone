@@ -28,11 +28,11 @@ const createFlatProxy = (callback: any) => {
 };
 
 type Query = {
-  query: (param: string) => AxiosResponse;
+  query: (param: { [key: string]: string }) => AxiosResponse;
 };
 
 type Mutate = {
-  mutate: (param: string) => AxiosResponse;
+  mutate: (param: { [key: string]: string }) => AxiosResponse;
 };
 
 type OverwriteChildren<T> = {
@@ -50,12 +50,14 @@ export const createTRPCProxy = <T>() => {
       const procedureType = pathCopy.pop();
 
       if (procedureType === "query") {
-        return axios.get(`http://localhost:3000/${routeName}?args=${args[0]}`);
+        return axios.get(
+          `http://localhost:3000/${routeName}?input=${encodeURIComponent(
+            JSON.stringify(args[0])
+          )}`
+        );
       }
 
-      return axios.post(`http://localhost:3000/${routeName}`, {
-        args: args[0],
-      });
+      return axios.post(`http://localhost:3000/${routeName}`, args[0]);
     });
   }) as unknown as OverwriteChildren<T>;
 };
