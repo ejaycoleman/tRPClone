@@ -1,5 +1,6 @@
 import express, { Request } from "express";
 import bodyParser from "body-parser";
+import { z } from "zod";
 
 export const router = <T>(routes: { [K in keyof T]: T[K] }) => {
   return routes;
@@ -13,8 +14,8 @@ interface JSONObject {
 
 interface JSONArray extends Array<JSONValue> {}
 
-export type Get = {
-  callback: (req?: JSONValue) => string | string[];
+export type Get<T> = {
+  callback: (input?: T) => string | string[];
   type: "get";
 };
 export type Post = {
@@ -22,10 +23,23 @@ export type Post = {
   type: "post";
 };
 
-export const get = (
-  getCallback: (req?: JSONValue) => string | string[]
-): Get => {
-  return { callback: getCallback, type: "get" };
+// export const get = (
+//   getCallback: (req?: JSONValue) => string | string[]
+// ): Get => {
+//   return { callback: getCallback, type: "get" };
+// };
+
+export const get = <T>(
+  getCallback: (input?: T) => string | string[],
+  validate?: z.ZodType<any, any, any>
+): Get<T> => {
+  return {
+    callback: (input) => {
+      validate?.parse(input);
+      return getCallback(input);
+    },
+    type: "get",
+  };
 };
 
 export const post = (
@@ -34,10 +48,31 @@ export const post = (
   return { callback: getCallback, type: "post" };
 };
 
+// const get = () => 'get'
+
+const mySchema = z.string();
+
+export const t = {
+  input: <T extends z.ZodType<any, any, any>>(callback: T) => {
+    type InputSchema = z.infer<typeof callback>;
+
+    return {
+      get: (i: (input: InputSchema) => string) => {
+        // console.log(i);
+        // callback.parse(i);
+        return get(i, callback);
+      },
+    };
+  },
+  get,
+};
+
+// const idk = t.input(z.string()).getFunction(() => "asssdd");
+
 export const createHTTPServer = ({
   router,
 }: {
-  router: { [key: string]: Get | Post };
+  router: { [key: string]: Get<any> | Post };
 }) => {
   const app = express();
 
