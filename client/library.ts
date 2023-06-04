@@ -27,19 +27,19 @@ const createFlatProxy = (callback: any) => {
   });
 };
 
-type Query = {
-  query: (param: { [key: string]: string }) => AxiosResponse;
+type Query<T> = {
+  query: (param: T) => AxiosResponse;
 };
 
-type Mutate = {
-  mutate: (param: { [key: string]: string }) => AxiosResponse;
+type Mutate<T> = {
+  mutate: (param: T) => AxiosResponse;
 };
 
 type OverwriteChildren<T> = {
-  [PropertyKey in keyof T]: T[PropertyKey] extends Get<any> // is this correct?
-    ? Query
-    : T[PropertyKey] extends Post<any>
-    ? Mutate
+  [PropertyKey in keyof T]: T[PropertyKey] extends Get<infer Input> // is this correct?
+    ? Query<Input>
+    : T[PropertyKey] extends Post<infer Input>
+    ? Mutate<Input>
     : unknown;
 };
 
