@@ -38,7 +38,7 @@ type Mutate = {
 type OverwriteChildren<T> = {
   [PropertyKey in keyof T]: T[PropertyKey] extends Get<any> // is this correct?
     ? Query
-    : T[PropertyKey] extends Post
+    : T[PropertyKey] extends Post<any>
     ? Mutate
     : unknown;
 };
