@@ -82,8 +82,12 @@ export const createHTTPServer = ({
   Object.entries(router).map(([routeName, routeFunction]) => {
     if (routeFunction.type == "get") {
       app.get("/" + routeName, (req, res) => {
-        const input = decodeURIComponent(req?.query.input as string);
-        res.send(routeFunction.callback(JSON.parse(input)));
+        if (req?.query.input) {
+          const input = decodeURIComponent(req?.query.input as string);
+          res.send(routeFunction.callback(JSON.parse(input)));
+        } else {
+          res.send();
+        }
       });
       return;
     }

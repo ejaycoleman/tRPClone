@@ -54,11 +54,11 @@ export const createTRPCProxy = <T>() => {
       const procedureType = pathCopy.pop();
 
       if (procedureType === "query") {
-        return axios.get(
-          `http://localhost:3000/${routeName}?input=${encodeURIComponent(
-            JSON.stringify(args[0])
-          )}`
-        );
+        const parsedArgs = args[0]
+          ? `?input=${encodeURIComponent(JSON.stringify(args[0]))}`
+          : "";
+
+        return axios.get(`http://localhost:3000/${routeName}${parsedArgs}`);
       }
 
       return axios.post(`http://localhost:3000/${routeName}`, args[0]);
