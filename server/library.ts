@@ -65,8 +65,8 @@ export const t = {
       },
     };
   },
-  get: (getCallback: () => string | string[]) => get(getCallback),
-  post: (postCallback: () => string | string[]) => post(postCallback),
+  get: get<"no_input">,
+  post: post<"no_input">,
 };
 
 export const createHTTPServer = ({

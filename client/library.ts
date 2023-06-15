@@ -28,11 +28,15 @@ const createFlatProxy = (callback: any) => {
 };
 
 type Query<T> = {
-  query: (param: T) => AxiosResponse;
+  query: T extends "no_input"
+    ? () => AxiosResponse
+    : (param: T) => AxiosResponse;
 };
 
 type Mutate<T> = {
-  mutate: (param: T) => AxiosResponse;
+  mutate: T extends "no_input"
+    ? () => AxiosResponse
+    : (param: T) => AxiosResponse;
 };
 
 type OverwriteChildren<T> = {
