@@ -1,9 +1,7 @@
 import type { AppRouter } from "../server/server";
 import { createTRPCProxy } from "./library";
 
-const createTRPCProxyClient = () => createTRPCProxy<AppRouter>();
-
-const t = createTRPCProxyClient();
+const t = createTRPCProxy<AppRouter>();
 
 const query = async () => {
   const query = await t.getValues.query("value");
