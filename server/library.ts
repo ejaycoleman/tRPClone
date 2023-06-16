@@ -14,13 +14,13 @@ interface JSONObject {
 
 interface JSONArray extends Array<JSONValue> {}
 
-export type Get<T> = {
-  callback: (input?: T) => JSONObject;
+export type Get<Input, Response = JSONObject> = {
+  callback: (input?: Input) => Response;
   type: "get";
 };
 
-export type Post<T> = {
-  callback: (input?: T) => JSONObject;
+export type Post<Input, Response = JSONObject> = {
+  callback: (input?: Input) => Response;
   type: "post";
 };
 
