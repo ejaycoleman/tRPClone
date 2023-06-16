@@ -15,17 +15,17 @@ interface JSONObject {
 interface JSONArray extends Array<JSONValue> {}
 
 export type Get<T> = {
-  callback: (input?: T) => string | string[];
+  callback: (input?: T) => JSONObject;
   type: "get";
 };
 
 export type Post<T> = {
-  callback: (input?: T) => string | string[];
+  callback: (input?: T) => JSONObject;
   type: "post";
 };
 
 export const get = <T>(
-  getCallback: (input?: T) => string | string[],
+  getCallback: (input?: T) => JSONObject,
   validate?: z.ZodType<any, any, any>
 ): Get<T> => {
   return {
@@ -38,7 +38,7 @@ export const get = <T>(
 };
 
 export const post = <T>(
-  postCallback: (input?: T) => string | string[],
+  postCallback: (input?: T) => JSONObject,
   validate?: z.ZodType<any, any, any>
 ): Post<T> => {
   return {
@@ -50,17 +50,15 @@ export const post = <T>(
   };
 };
 
-const mySchema = z.string();
-
 export const t = {
   input: <T extends z.ZodType<any, any, any>>(callback: T) => {
     type InputSchema = z.infer<typeof callback>;
 
     return {
-      get: (i: (input: InputSchema) => string) => {
+      get: (i: (input: InputSchema) => JSONObject) => {
         return get(i, callback);
       },
-      post: (i: (input: InputSchema) => string) => {
+      post: (i: (input: InputSchema) => JSONObject) => {
         return post(i, callback);
       },
     };
@@ -86,7 +84,7 @@ export const createHTTPServer = ({
           const input = decodeURIComponent(req?.query.input as string);
           res.send(routeFunction.callback(JSON.parse(input)));
         } else {
-          res.send();
+          res.send(routeFunction.callback());
         }
       });
       return;
