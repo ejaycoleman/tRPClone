@@ -19,7 +19,7 @@ export type Get<Input, Response = JSONObject> = {
   type: "get";
 };
 
-export type Post<Input, Response = JSONObject> = {
+export type Post<Input, Response extends JSONObject> = {
   callback: (input?: Input) => Response;
   type: "post";
 };
@@ -37,10 +37,10 @@ export const get = <T>(
   };
 };
 
-export const post = <T>(
-  postCallback: (input?: T) => JSONObject,
+export const post = <T, O extends JSONObject>(
+  postCallback: (input?: T) => O,
   validate?: z.ZodType<any, any, any>
-): Post<T> => {
+): Post<T, O> => {
   return {
     callback: (input) => {
       validate?.parse(input);
@@ -58,19 +58,20 @@ export const t = {
       get: (i: (input: InputSchema) => JSONObject) => {
         return get(i, callback);
       },
-      post: (i: (input: InputSchema) => JSONObject) => {
+      post: <T extends JSONObject>(i: (input: InputSchema) => T) => {
         return post(i, callback);
       },
     };
   },
   get: get<"no_input">,
-  post: post<"no_input">,
+  post: <T extends JSONObject>(postCallback: () => T) =>
+    post<"no_input", T>(postCallback),
 };
 
 export const createHTTPServer = ({
   router,
 }: {
-  router: { [key: string]: Get<any> | Post<any> };
+  router: { [key: string]: Get<any> | Post<any, any> };
 }) => {
   const app = express();
 
