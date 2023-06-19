@@ -23,7 +23,7 @@ type callbackType = ({
 }: {
   path: string[];
   args: string[];
-}) => Promise<AxiosResponse<any, any>>;
+}) => Promise<AxiosResponse<string[], string[]>>;
 
 const createRecursiveProxy = (callback: callbackType) =>
   createInnerProxy(callback, []);
@@ -36,23 +36,26 @@ const createFlatProxy = (callback: (routeName: string) => unknown) => {
   });
 };
 
-type Query<T> = {
-  query: T extends "no_input"
-    ? () => AxiosResponse
-    : (param: T) => AxiosResponse;
+type Query<Input, Response> = {
+  query: Input extends "no_input"
+    ? () => AxiosResponse<Response>
+    : (param: Input) => AxiosResponse<Response>;
 };
 
-type Mutate<T> = {
-  mutate: T extends "no_input"
-    ? () => AxiosResponse
-    : (param: T) => AxiosResponse;
+type Mutate<Input, Response> = {
+  mutate: Input extends "no_input"
+    ? () => AxiosResponse<Response>
+    : (param: Input) => AxiosResponse<Response>;
 };
 
 type OverwriteChildren<T> = {
-  [PropertyKey in keyof T]: T[PropertyKey] extends Get<infer Input>
-    ? Query<Input>
-    : T[PropertyKey] extends Post<infer Input>
-    ? Mutate<Input>
+  [PropertyKey in keyof T]: T[PropertyKey] extends Get<
+    infer Input,
+    infer Response
+  >
+    ? Query<Input, Response>
+    : T[PropertyKey] extends Post<infer Input, infer Response>
+    ? Mutate<Input, Response>
     : unknown;
 };
 
