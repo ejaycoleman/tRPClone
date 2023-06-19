@@ -6,7 +6,8 @@ type ReturnType = {
 };
 
 const appRouter = router({
-  getValues: t.input(z.string()).get((input) => ({
+  getValues: t.input(z.string()).get<ReturnType>((input) => ({
+    // optional type return definition
     res: `GET called with the args: ${JSON.stringify(input)}`,
   })),
   secondGet: t.get(() => ({ res: `GET!` })),
@@ -17,7 +18,6 @@ const appRouter = router({
   postValues: t
     .input(z.object({ name: z.string() }))
     .post<ReturnType>((input) => {
-      // optional type return definition
       console.log("post endpoint hit!");
       return { res: `POST hit with ${input.name}` };
     }),
