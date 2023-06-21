@@ -36,23 +36,19 @@ const createFlatProxy = (callback: (routeName: string) => unknown) => {
   });
 };
 
-type Query<T> = {
-  query: T extends "no_input"
-    ? () => AxiosResponse
-    : (param: T) => AxiosResponse;
+type Query = {
+  query: () => AxiosResponse;
 };
 
-type Mutate<T> = {
-  mutate: T extends "no_input"
-    ? () => AxiosResponse
-    : (param: T) => AxiosResponse;
+type Mutate = {
+  mutate: () => AxiosResponse;
 };
 
 type OverwriteChildren<T> = {
-  [PropertyKey in keyof T]: T[PropertyKey] extends Get<infer Input>
-    ? Query<Input>
-    : T[PropertyKey] extends Post<infer Input>
-    ? Mutate<Input>
+  [PropertyKey in keyof T]: T[PropertyKey] extends Get
+    ? Query
+    : T[PropertyKey] extends Post
+    ? Mutate
     : unknown;
 };
 

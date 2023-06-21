@@ -1,20 +1,15 @@
-import { createHTTPServer, router, t } from "./library";
-import { z } from "zod";
+import { createHTTPServer, t } from "./library";
 
-const appRouter = router({
-  getValues: t.input(z.string()).get((input) => ({
-    res: `GET called with the args: ${JSON.stringify(input)}`,
-  })),
-  secondGet: t.get(() => ({ res: `GET!` })),
+const appRouter = {
+  getValues: t.get(() => {
+    console.log("get endpoint hit!");
+    return { res: `GET called` };
+  }),
   post: t.post(() => {
     console.log("post endpoint hit!");
     return { ret: "POST hit" };
   }),
-  postValues: t.input(z.object({ name: z.string() })).post((input) => {
-    console.log("post endpoint hit!");
-    return { res: `POST hit with ${input.name}` };
-  }),
-});
+};
 
 export type AppRouter = typeof appRouter; // for client
 
