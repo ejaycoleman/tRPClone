@@ -23,18 +23,10 @@ type callbackType = ({
 }: {
   path: string[];
   args: string[];
-}) => Promise<AxiosResponse<string[], string[]>>;
+}) => Promise<AxiosResponse<any, any>>;
 
 const createRecursiveProxy = (callback: callbackType) =>
   createInnerProxy(callback, []);
-
-const createFlatProxy = (callback: (routeName: string) => unknown) => {
-  return new Proxy(() => {}, {
-    get(_obj, name) {
-      return callback(name as any);
-    },
-  });
-};
 
 type Query<Input, Response> = {
   query: Input extends "no_input"
@@ -60,21 +52,20 @@ type OverwriteChildren<T> = {
 };
 
 export const createTRPCProxy = <T>() => {
-  return createFlatProxy((routeName: string) => {
-    return createRecursiveProxy(
-      ({ path, args }: { path: string[]; args: string[] }) => {
-        const pathCopy = [routeName, ...path];
-        const procedureType = pathCopy.pop();
-        if (procedureType === "query") {
-          const parsedArgs = args[0]
-            ? `?input=${encodeURIComponent(JSON.stringify(args[0]))}`
-            : "";
+  return createRecursiveProxy(
+    ({ path, args }: { path: string[]; args: string[] }) => {
+      const routeName = path[0];
+      const procedureType = path[path.length - 1];
 
-          return axios.get(`http://localhost:3000/${routeName}${parsedArgs}`);
-        }
+      if (procedureType === "query") {
+        const parsedArgs = args[0]
+          ? `?input=${encodeURIComponent(JSON.stringify(args[0]))}`
+          : "";
 
-        return axios.post(`http://localhost:3000/${routeName}`, args[0]);
+        return axios.get(`http://localhost:3000/${routeName}${parsedArgs}`);
       }
-    );
-  }) as unknown as OverwriteChildren<T>;
+
+      return axios.post(`http://localhost:3000/${routeName}`, args[0]);
+    }
+  ) as OverwriteChildren<T>;
 };
