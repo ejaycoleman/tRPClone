@@ -1,5 +1,5 @@
 import type { AppRouter } from "../server/server";
-import { createTRPCProxy } from "./library";
+import { createTRPCProxy } from "../library/client";
 
 const t = createTRPCProxy<AppRouter>();
 

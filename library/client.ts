@@ -1,4 +1,4 @@
-import { Get, Post } from "../server/library";
+import { Get, Post } from "./server";
 import axios, { AxiosResponse } from "axios";
 
 const createInnerProxy = (callback: callbackType, path: any[]) => {
