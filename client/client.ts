@@ -1,22 +1,22 @@
-import type { AppRouter } from "../server/server";
 import { createTRPCProxy } from "../library/client";
+import type { AppRouter } from "../server/server";
 
-const t = createTRPCProxy<AppRouter>();
+const trpc = createTRPCProxy<AppRouter>();
 
-const query = async () => {
-  const query = await t.getValues.query("value");
-  console.log(query.data);
-  const query2 = await t.secondGet.query();
-  console.log(query2.data);
-};
+async function main() {
+  /**
+   * Inferring types
+   */
+  const users = await trpc.userList.query();
 
-query();
+  // trpc.userList.query;
+  console.log("Users:", users.data);
 
-const mutate = async () => {
-  const query = await t.postValues.mutate({ name: "value" });
-  console.log(query.data);
-  const query2 = await t.post.mutate();
-  console.log(query2.data);
-};
+  const createdUser = await trpc.userCreate.mutate({ name: "sachinraja" });
+  console.log("Created user:", createdUser.data);
 
-mutate();
+  const user = await trpc.userById.query("1");
+  console.log("User 1:", user.data);
+}
+
+main().catch(console.error);

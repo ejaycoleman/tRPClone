@@ -14,17 +14,17 @@ interface JSONObject {
 
 interface JSONArray extends Array<JSONValue> {}
 
-export type Get<Input, Response extends JSONObject> = {
+export type Get<Input, Response extends Promise<JSONValue>> = {
   callback: (input?: Input) => Response;
   type: "get";
 };
 
-export type Post<Input, Response extends JSONObject> = {
+export type Post<Input, Response extends Promise<JSONValue>> = {
   callback: (input?: Input) => Response;
   type: "post";
 };
 
-export const get = <T, O extends JSONObject>(
+export const get = <T, O extends Promise<JSONValue>>(
   getCallback: (input?: T) => O,
   validate?: z.ZodType<any, any, any>
 ): Get<T, O> => {
@@ -37,7 +37,7 @@ export const get = <T, O extends JSONObject>(
   };
 };
 
-export const post = <T, O extends JSONObject>(
+export const post = <T, O extends Promise<JSONValue>>(
   postCallback: (input?: T) => O,
   validate?: z.ZodType<any, any, any>
 ): Post<T, O> => {
@@ -55,18 +55,18 @@ export const t = {
     type InputSchema = z.infer<typeof callback>;
 
     return {
-      get: <T extends JSONObject>(i: (input: InputSchema) => T) => {
+      get: <T extends JSONValue>(i: (input: InputSchema) => Promise<T>) => {
         return get(i, callback);
       },
-      post: <T extends JSONObject>(i: (input: InputSchema) => T) => {
+      post: <T extends JSONValue>(i: (input: InputSchema) => Promise<T>) => {
         return post(i, callback);
       },
     };
   },
-  get: <T extends JSONObject>(getCallback: () => T) =>
-    get<"no_input", T>(getCallback),
-  post: <T extends JSONObject>(postCallback: () => T) =>
-    post<"no_input", T>(postCallback),
+  get: <T extends JSONValue>(getCallback: () => Promise<T>) =>
+    get<"no_input", Promise<T>>(getCallback),
+  post: <T extends JSONValue>(postCallback: () => Promise<T>) =>
+    post<"no_input", Promise<T>>(postCallback),
 };
 
 export const createHTTPServer = ({
@@ -81,20 +81,20 @@ export const createHTTPServer = ({
 
   Object.entries(router).map(([routeName, routeFunction]) => {
     if (routeFunction.type == "get") {
-      app.get("/" + routeName, (req, res) => {
+      app.get("/" + routeName, async (req, res) => {
         if (req?.query.input) {
           const input = decodeURIComponent(req?.query.input as string);
-          res.send(routeFunction.callback(JSON.parse(input)));
+          res.send(await routeFunction.callback(JSON.parse(input)));
         } else {
-          res.send(routeFunction.callback());
+          res.send(await routeFunction.callback());
         }
       });
       return;
     }
 
     if (routeFunction.type == "post") {
-      app.post("/" + routeName, (req, res) => {
-        res.send(routeFunction.callback(req.body));
+      app.post("/" + routeName, async (req, res) => {
+        res.send(await routeFunction.callback(req.body));
       });
       return;
     }
