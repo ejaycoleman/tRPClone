@@ -1,3 +1,5 @@
+// Example based on https://github.com/trpc/trpc/tree/main/examples/minimal
+
 import { createTRPCProxy } from "../library/client";
 import type { AppRouter } from "../server/server";
 

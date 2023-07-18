@@ -1,3 +1,5 @@
+// Example based on https://github.com/trpc/trpc/tree/main/examples/minimal
+
 import { z } from "zod";
 import { db } from "./db";
 import { createHTTPServer, router, t } from "../library/server";

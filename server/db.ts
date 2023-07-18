@@ -1,3 +1,5 @@
+// Example based on https://github.com/trpc/trpc/tree/main/examples/minimal
+
 type User = { id: string; name: string };
 
 // Imaginary database

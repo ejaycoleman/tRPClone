@@ -14,17 +14,17 @@ interface JSONObject {
 
 interface JSONArray extends Array<JSONValue> {}
 
-export type Get<Input, Response extends Promise<JSONValue>> = {
+export type Get<Input, Response extends Promise<JSONValue> | JSONValue> = {
   callback: (input?: Input) => Response;
   type: "get";
 };
 
-export type Post<Input, Response extends Promise<JSONValue>> = {
+export type Post<Input, Response extends Promise<JSONValue> | JSONValue> = {
   callback: (input?: Input) => Response;
   type: "post";
 };
 
-export const get = <T, O extends Promise<JSONValue>>(
+export const get = <T, O extends Promise<JSONValue> | JSONValue>(
   getCallback: (input?: T) => O,
   validate?: z.ZodType<any, any, any>
 ): Get<T, O> => {
@@ -37,7 +37,7 @@ export const get = <T, O extends Promise<JSONValue>>(
   };
 };
 
-export const post = <T, O extends Promise<JSONValue>>(
+export const post = <T, O extends Promise<JSONValue> | JSONValue>(
   postCallback: (input?: T) => O,
   validate?: z.ZodType<any, any, any>
 ): Post<T, O> => {
@@ -55,18 +55,20 @@ export const t = {
     type InputSchema = z.infer<typeof callback>;
 
     return {
-      get: <T extends JSONValue>(i: (input: InputSchema) => Promise<T>) => {
+      get: <T extends JSONValue>(i: (input: InputSchema) => Promise<T> | T) => {
         return get(i, callback);
       },
-      post: <T extends JSONValue>(i: (input: InputSchema) => Promise<T>) => {
+      post: <T extends JSONValue>(
+        i: (input: InputSchema) => Promise<T> | T
+      ) => {
         return post(i, callback);
       },
     };
   },
-  get: <T extends JSONValue>(getCallback: () => Promise<T>) =>
-    get<"no_input", Promise<T>>(getCallback),
-  post: <T extends JSONValue>(postCallback: () => Promise<T>) =>
-    post<"no_input", Promise<T>>(postCallback),
+  get: <T extends JSONValue>(getCallback: () => Promise<T> | T) =>
+    get<"no_input", Promise<T> | T>(getCallback),
+  post: <T extends JSONValue>(postCallback: () => Promise<T> | T) =>
+    post<"no_input", Promise<T> | T>(postCallback),
 };
 
 export const createHTTPServer = ({
