@@ -2,10 +2,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import { z } from "zod";
 
-export const router = <T>(routes: { [K in keyof T]: T[K] }) => {
-  return routes;
-};
-
 type JSONValue = string | number | boolean | JSONObject | JSONArray;
 
 interface JSONObject {
