@@ -1,29 +1,31 @@
-import { createHTTPServer, router, t } from "../library/server";
-import { z } from "zod";
+// Example based on https://github.com/trpc/trpc/tree/main/examples/minimal
 
-type ReturnType = {
-  res: string;
-};
+import { z } from "zod";
+import { db } from "./db";
+import { createHTTPServer, router, t } from "../library/server";
 
 const appRouter = router({
-  getValues: t.input(z.string()).get<ReturnType>((input) => ({
-    // optional type return definition
-    res: `GET called with the args: ${JSON.stringify(input)}`,
-  })),
-  secondGet: t.get(() => ({ res: `GET!` })),
-  post: t.post(() => {
-    console.log("post endpoint hit!");
-    return { res: "POST hit" };
+  userList: t.get(async () => {
+    // Retrieve users from a datasource, this is an imaginary database
+    const users = await db.user.findMany();
+    //    ^?
+    return users;
   }),
-  postValues: t
-    .input(z.object({ name: z.string() }))
-    .post<ReturnType>((input) => {
-      console.log("post endpoint hit!");
-      return { res: `POST hit with ${input.name}` };
-    }),
+  userById: t.input(z.string()).get(async (input) => {
+    // Retrieve the user with the given ID
+    const user = await db.user.findById(input);
+    return user || "not found";
+  }),
+  userCreate: t.input(z.object({ name: z.string() })).post(async (input) => {
+    // Create a new user in the database
+    const user = await db.user.create(input);
+    //    ^?
+    return user;
+  }),
 });
 
-export type AppRouter = typeof appRouter; // for client
+// Export type router type signature, NOT the router itself.
+export type AppRouter = typeof appRouter;
 
 const server = createHTTPServer({
   router: appRouter,
