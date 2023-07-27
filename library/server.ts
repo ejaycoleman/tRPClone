@@ -47,17 +47,17 @@ export const post = <T, O extends Promise<JSONValue> | JSONValue>(
 };
 
 export const t = {
-  input: <T extends z.ZodType<any, any, any>>(callback: T) => {
-    type InputSchema = z.infer<typeof callback>;
+  input: <T extends z.ZodType<any, any, any>>(inputValidation: T) => {
+    type InputSchema = z.infer<typeof inputValidation>;
 
     return {
       get: <T extends JSONValue>(i: (input: InputSchema) => Promise<T> | T) => {
-        return get(i, callback);
+        return get(i, inputValidation);
       },
       post: <T extends JSONValue>(
         i: (input: InputSchema) => Promise<T> | T
       ) => {
-        return post(i, callback);
+        return post(i, inputValidation);
       },
     };
   },
